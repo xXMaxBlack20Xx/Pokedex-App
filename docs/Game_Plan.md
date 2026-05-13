@@ -321,13 +321,13 @@ El proyecto debe organizarse correctamente en carpetas, componentes, servicios, 
 
 ```txt
 src/
-	components/
-	screens/ o pages/
-	services/
-	hooks/
-	types/
-	utils/
-	storage/
+ components/
+ screens/ o pages/
+ services/
+ hooks/
+ types/
+ utils/
+ storage/
 ```
 
 ### Descripción sugerida de carpetas
