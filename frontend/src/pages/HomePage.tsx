@@ -21,7 +21,6 @@ import type {
   PokemonListItem,
   PokemonListPage,
   PokemonFavorite,
-  PokemonTypeListItem,
 } from '../types/pokemon';
 
 const POKEMON_LIMIT = 30;
@@ -51,7 +50,7 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('');
-  const [availableTypes, setAvailableTypes] = useState<PokemonTypeListItem[]>([]);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [isLoadingTypes, setIsLoadingTypes] = useState(true);
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
 
@@ -94,10 +93,9 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
       try {
         setIsLoading(true);
         setErrorMessage(null);
-        const offset = (page - 1) * POKEMON_LIMIT;
         const pokemonPage = await getPokemonList(
           POKEMON_LIMIT,
-          offset,
+          page,
           abortController.signal,
         );
 

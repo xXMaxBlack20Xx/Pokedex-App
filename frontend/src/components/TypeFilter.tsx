@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 interface TypeFilterProps {
-  types: { name: string }[];
+  types: string[];
   selectedType: string;
   onSelectType: (type: string) => void;
   isLoading?: boolean;
@@ -71,12 +71,12 @@ export function TypeFilter({
       </Pressable>
 
       {types.map((type) => {
-        const isSelected = selectedType === type.name;
-        const color = TYPE_COLORS[type.name] ?? '#8793a3';
+        const isSelected = selectedType === type;
+        const color = TYPE_COLORS[type] ?? '#8793a3';
         return (
           <Pressable
-            key={type.name}
-            onPress={() => onSelectType(type.name)}
+            key={type}
+            onPress={() => onSelectType(type)}
             style={[
               styles.chip,
               styles.chipUnselected,
@@ -90,7 +90,7 @@ export function TypeFilter({
                 isSelected && styles.chipTextSelected,
               ]}
             >
-              {type.name}
+              {type}
             </Text>
           </Pressable>
         );

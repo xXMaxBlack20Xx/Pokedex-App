@@ -19,20 +19,11 @@ export interface PokemonDetail {
   id: number;
   name: string;
   image: string;
-  sprites: {
-    front: string;
-    official: string;
-  };
-  types: PokemonTypeInfo[];
-  stats: PokemonStat[];
-  abilities: PokemonAbility[];
+  types: string[];
   height: number;
   weight: number;
-}
-
-export interface PokemonTypeInfo {
-  name: string;
-  url: string;
+  stats: PokemonStat[];
+  abilities: PokemonAbility[];
 }
 
 export interface PokemonStat {
@@ -43,22 +34,6 @@ export interface PokemonStat {
 export interface PokemonAbility {
   name: string;
   isHidden: boolean;
-}
-
-export interface PokemonTypeListItem {
-  name: string;
-  url: string;
-}
-
-export interface PokemonTypeDetail {
-  name: string;
-  pokemon: {
-    pokemon: {
-      name: string;
-      url: string;
-    };
-    slot: number;
-  }[];
 }
 
 export interface PokemonFavorite {

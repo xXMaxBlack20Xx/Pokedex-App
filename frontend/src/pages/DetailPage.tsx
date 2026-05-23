@@ -107,7 +107,7 @@ export function DetailPage({ pokemon, onGoBack }: DetailPageProps) {
     id: detail.id,
     name: detail.name,
     image: detail.image,
-    types: detail.types.map((t) => t.name),
+    types: detail.types,
     addedAt: Date.now(),
   };
 
@@ -153,14 +153,14 @@ export function DetailPage({ pokemon, onGoBack }: DetailPageProps) {
         </View>
 
         <View style={styles.types}>
-          {detail.types.map((t) => {
-            const color = TYPE_COLORS[t.name] ?? '#8793a3';
+          {detail.types.map((typeName) => {
+            const color = TYPE_COLORS[typeName] ?? '#8793a3';
             return (
               <View
-                key={t.name}
+                key={typeName}
                 style={[styles.typeBadge, { backgroundColor: color }]}
               >
-                <Text style={styles.typeText}>{t.name}</Text>
+                <Text style={styles.typeText}>{typeName}</Text>
               </View>
             );
           })}
