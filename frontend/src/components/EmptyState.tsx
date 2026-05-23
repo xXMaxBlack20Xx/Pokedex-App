@@ -1,9 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-export function EmptyState() {
+interface EmptyStateProps {
+  message?: string;
+}
+
+export function EmptyState({
+  message = 'No hay Pokémon disponibles.',
+}: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.message}>No hay Pokémon disponibles.</Text>
+      <Text style={styles.message}>{message}</Text>
     </View>
   );
 }

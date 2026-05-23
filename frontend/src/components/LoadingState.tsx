@@ -1,10 +1,16 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
-export function LoadingState() {
+interface LoadingStateProps {
+  message?: string;
+}
+
+export function LoadingState({
+  message = 'Cargando Pokémon...',
+}: LoadingStateProps) {
   return (
     <View style={styles.container}>
       <ActivityIndicator color="#c83642" size="large" />
-      <Text style={styles.message}>Cargando Pokémon...</Text>
+      <Text style={styles.message}>{message}</Text>
     </View>
   );
 }

@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 interface ErrorStateProps {
-  message: string;
+  message?: string;
 }
 
-export function ErrorState({ message }: ErrorStateProps) {
+export function ErrorState({
+  message = 'Ocurrió un error inesperado.',
+}: ErrorStateProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.message}>{message}</Text>
