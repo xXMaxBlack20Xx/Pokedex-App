@@ -42,9 +42,10 @@ export function TypeFilter({
 }: TypeFilterProps) {
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={styles.content}
       horizontal
       showsHorizontalScrollIndicator={false}
+      style={styles.scroll}
     >
       {isLoading && types.length === 0 ? (
         <ActivityIndicator color="#c83642" size="small" />
@@ -54,14 +55,15 @@ export function TypeFilter({
         onPress={() => onSelectType('')}
         style={[
           styles.chip,
-          selectedType === '' && styles.chipSelected,
-          selectedType === '' && { backgroundColor: '#17202b' },
+          styles.chipUnselected,
+          selectedType === '' && styles.chipSelectedAll,
         ]}
       >
         <Text
           style={[
             styles.chipText,
-            selectedType === '' && styles.chipTextSelected,
+            styles.chipTextUnselected,
+            selectedType === '' && styles.chipTextSelectedAll,
           ]}
         >
           Todos
@@ -70,22 +72,21 @@ export function TypeFilter({
 
       {types.map((type) => {
         const isSelected = selectedType === type.name;
-        const bgColor = TYPE_COLORS[type.name] ?? '#8793a3';
+        const color = TYPE_COLORS[type.name] ?? '#8793a3';
         return (
           <Pressable
             key={type.name}
             onPress={() => onSelectType(type.name)}
             style={[
               styles.chip,
-              isSelected && styles.chipSelected,
-              { backgroundColor: bgColor + '20' },
-              isSelected && { backgroundColor: bgColor },
+              styles.chipUnselected,
+              isSelected && { backgroundColor: color, borderColor: color },
             ]}
           >
             <Text
               style={[
                 styles.chipText,
-                { color: bgColor },
+                styles.chipTextUnselected,
                 isSelected && styles.chipTextSelected,
               ]}
             >
@@ -98,26 +99,50 @@ export function TypeFilter({
   );
 }
 
+const CHIP_HEIGHT = 36;
+const CHIP_PADDING = 14;
+const CHIP_FONT_SIZE = 13;
+const CHIP_BORDER = 1;
+
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
+    maxHeight: CHIP_HEIGHT + CHIP_PADDING * 2 + CHIP_BORDER * 2 + 16,
+    minHeight: CHIP_HEIGHT + CHIP_PADDING * 2 + CHIP_BORDER * 2 + 16,
+  },
+  content: {
+    alignItems: 'center',
     gap: 8,
     paddingBottom: 16,
     paddingHorizontal: 16,
   },
   chip: {
+    alignItems: 'center',
     borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    minHeight: CHIP_HEIGHT,
+    paddingHorizontal: CHIP_PADDING,
   },
-  chipSelected: {
-    borderWidth: 0,
+  chipUnselected: {
+    backgroundColor: '#e8edf3',
+    borderColor: 'transparent',
+    borderWidth: CHIP_BORDER,
+  },
+  chipSelectedAll: {
+    backgroundColor: '#17202b',
+    borderColor: '#17202b',
   },
   chipText: {
-    fontSize: 13,
+    fontSize: CHIP_FONT_SIZE,
     fontWeight: '800',
     textTransform: 'capitalize',
   },
+  chipTextUnselected: {
+    color: '#596579',
+  },
   chipTextSelected: {
+    color: '#ffffff',
+  },
+  chipTextSelectedAll: {
     color: '#ffffff',
   },
 });
