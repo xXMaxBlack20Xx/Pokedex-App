@@ -170,7 +170,6 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
   function handleSelectType(type: string) {
     setSelectedType(type);
     setFilterMode('all');
-    setSearchQuery('');
   }
 
   function handleToggleFavoritesMode() {
@@ -180,7 +179,6 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
     } else {
       setFilterMode('favorites');
       setSelectedType('');
-      setSearchQuery('');
     }
   }
 
@@ -206,6 +204,25 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
 
   const showEmptyState = !isLoading && !errorMessage;
   const showPagination = !selectedType && filterMode === 'all';
+
+  function getEmptyMessage(): string {
+    const hasSearch = searchQuery.trim().length > 0;
+    const hasType = selectedType.length > 0;
+
+    if (filterMode === 'favorites' && favorites.length === 0) {
+      return 'No tienes Pokémon favoritos. Toca el \u2661 para agregar.';
+    }
+    if (hasSearch && hasType) {
+      return `No se encontraron Pokémon que coincidan con "${searchQuery.trim()}" y el tipo "${selectedType}".`;
+    }
+    if (hasSearch) {
+      return `No se encontraron Pokémon con el nombre "${searchQuery.trim()}".`;
+    }
+    if (hasType) {
+      return `No hay Pokémon disponibles para el tipo "${selectedType}".`;
+    }
+    return 'No hay Pokémon disponibles.';
+  }
 
   const handleCardPress = useCallback(
     (pokemon: PokemonListItem) => {
@@ -239,12 +256,8 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
               <LoadingState />
             ) : errorMessage ? (
               <ErrorState message={errorMessage} />
-            ) : filterMode === 'favorites' && favorites.length === 0 ? (
-              <EmptyState message="No tienes Pokémon favoritos. Toca el \u2661 para agregar." />
-            ) : searchQuery.trim() ? (
-              <EmptyState message="No se encontraron Pokémon." />
             ) : (
-              <EmptyState />
+              <EmptyState message={getEmptyMessage()} />
             )
           }
           ListHeaderComponent={
@@ -260,16 +273,21 @@ export function HomeScreen({ onNavigateToDetail }: HomeScreenProps) {
               {showPagination && (
                 <Text style={styles.counter}>
                   Página {page} de {totalPages} &middot;{' '}
-                  {pokemonList.length} de {pagination.total} Pokémon
+                  {filteredPokemon.length} de {pagination.total} Pokémon
                 </Text>
               )}
               {selectedType ? (
                 <Text style={styles.counter}>
                   Tipo: {selectedType} &middot; {filteredPokemon.length} Pokémon
+                  {searchQuery.trim() ? ` (filtrados por nombre)` : ''}
                 </Text>
               ) : filterMode === 'favorites' ? (
                 <Text style={styles.counter}>
-                  {favorites.length} favoritos
+                  {filteredPokemon.length} de {favorites.length} favoritos
+                </Text>
+              ) : searchQuery.trim() ? (
+                <Text style={styles.counter}>
+                  Resultados para "{searchQuery.trim()}": {filteredPokemon.length} Pokémon
                 </Text>
               ) : null}
             </View>
