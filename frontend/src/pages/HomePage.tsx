@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../hooks/useFavorites';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';

@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import type { PokemonListItem } from './src/types/pokemon';
 import { HomeScreen } from './src/pages/HomePage';
 import { DetailPage } from './src/pages/DetailPage';
@@ -14,7 +15,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="dark" />
       <NavigationContainer>
         <Stack.Navigator
@@ -28,7 +29,7 @@ export default function App() {
           <Stack.Screen name="Detail" component={DetailWrapper} />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </SafeAreaProvider>
   );
 }
 

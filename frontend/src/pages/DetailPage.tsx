@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import {
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../hooks/useFavorites';
 import { ErrorState } from '../components/ErrorState';
 import { LoadingState } from '../components/LoadingState';
