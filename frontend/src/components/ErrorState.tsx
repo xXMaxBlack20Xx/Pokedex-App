@@ -1,30 +1,21 @@
-import { StyleSheet, Text, View } from 'react-native';
-
 interface ErrorStateProps {
   message?: string;
+  onRetry?: () => void;
 }
 
 export function ErrorState({
   message = 'Ocurrió un error inesperado.',
+  onRetry,
 }: ErrorStateProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.message}>{message}</Text>
-    </View>
+    <section className="state-card state-card--error" role="alert">
+      <strong>Ocurrió un problema</strong>
+      <p>{message}</p>
+      {onRetry ? (
+        <button className="button button--secondary" type="button" onClick={onRetry}>
+          Reintentar
+        </button>
+      ) : null}
+    </section>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff4f5',
-    borderColor: '#f4b6bd',
-    borderRadius: 8,
-    borderWidth: 1,
-    padding: 18,
-  },
-  message: {
-    color: '#a12b35',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-});

@@ -2,24 +2,19 @@ export interface PokemonListItem {
   id: number;
   name: string;
   image: string;
-  types: string[];
+  types: PokemonType[];
 }
 
-export interface PokemonListPage {
-  items: PokemonListItem[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+export interface PokemonType {
+  name: string;
+  url?: string;
 }
 
 export interface PokemonDetail {
   id: number;
   name: string;
   image: string;
-  types: string[];
+  types: PokemonType[];
   height: number;
   weight: number;
   stats: PokemonStat[];
@@ -36,10 +31,16 @@ export interface PokemonAbility {
   isHidden: boolean;
 }
 
-export interface PokemonFavorite {
+export interface FavoritePokemon {
   id: number;
   name: string;
   image: string;
-  types: string[];
+  types: PokemonType[];
   addedAt: number;
+}
+
+export interface PokemonListResponse {
+  items: PokemonListItem[];
+  total: number;
+  nextOffset: number | null;
 }

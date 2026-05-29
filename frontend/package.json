@@ -1,27 +1,28 @@
 {
-  "name": "mini-pokedex-frontend",
+  "name": "pokedex-app-frontend",
   "version": "1.0.0",
-  "main": "index.ts",
+  "type": "module",
   "scripts": {
-    "start": "expo start",
-    "dev": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "typecheck": "tsc --noEmit"
+    "dev": "vite",
+    "start": "vite",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.2.0",
-    "@react-navigation/native": "^7.2.4",
-    "@react-navigation/native-stack": "^7.15.1",
-    "expo": "~54.0.33",
-    "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
-    "react-native": "0.81.5",
-    "react-native-safe-area-context": "~5.6.0",
-    "react-native-screens": "~4.16.0"
+    "react-dom": "19.1.0",
+    "react-router-dom": "^7.6.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
     "@types/react": "~19.1.0",
+    "@types/react-dom": "~19.1.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "eslint": "^9.27.0",
+    "globals": "^16.2.0",
+    "typescript-eslint": "^8.33.0",
     "typescript": "~5.9.2"
   },
   "private": true

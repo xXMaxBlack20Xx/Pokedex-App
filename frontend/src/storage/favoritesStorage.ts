@@ -1,34 +1,51 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { PokemonFavorite } from '../types/pokemon';
+import type { FavoritePokemon } from '../types/pokemon';
 
-const FAVORITES_KEY = '@pokedex_favorites';
+const FAVORITES_KEY = 'pokedex:favorites';
 
-export async function getFavorites(): Promise<PokemonFavorite[]> {
+export function getFavorites(): FavoritePokemon[] {
   try {
-    const json = await AsyncStorage.getItem(FAVORITES_KEY);
+    const json = window.localStorage.getItem(FAVORITES_KEY);
     if (!json) return [];
     const parsed: unknown = JSON.parse(json);
     if (!Array.isArray(parsed)) return [];
-    return parsed as PokemonFavorite[];
+    return parsed.filter(isFavoritePokemon);
   } catch {
     return [];
   }
 }
 
-export async function addFavorite(favorite: PokemonFavorite): Promise<void> {
-  const favorites = await getFavorites();
-  if (favorites.some((f) => f.id === favorite.id)) return;
-  favorites.push(favorite);
-  await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+export function saveFavorites(favorites: FavoritePokemon[]): void {
+  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
 }
 
-export async function removeFavorite(id: number): Promise<void> {
-  const favorites = await getFavorites();
+export function addFavorite(favorite: FavoritePokemon): FavoritePokemon[] {
+  const favorites = getFavorites();
+  if (favorites.some((f) => f.id === favorite.id)) return favorites;
+  const updated = [...favorites, favorite].sort((a, b) => a.id - b.id);
+  saveFavorites(updated);
+  return updated;
+}
+
+export function removeFavorite(id: number): FavoritePokemon[] {
+  const favorites = getFavorites();
   const updated = favorites.filter((f) => f.id !== id);
-  await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+  saveFavorites(updated);
+  return updated;
 }
 
-export async function isFavorite(id: number): Promise<boolean> {
-  const favorites = await getFavorites();
+export function isFavorite(id: number): boolean {
+  const favorites = getFavorites();
   return favorites.some((f) => f.id === id);
+}
+
+function isFavoritePokemon(value: unknown): value is FavoritePokemon {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<FavoritePokemon>;
+  return (
+    typeof candidate.id === 'number' &&
+    typeof candidate.name === 'string' &&
+    typeof candidate.image === 'string' &&
+    Array.isArray(candidate.types) &&
+    typeof candidate.addedAt === 'number'
+  );
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { PokemonFavorite } from '../types/pokemon';
+import type { FavoritePokemon, PokemonDetail, PokemonListItem } from '../types/pokemon';
 import {
   addFavorite as storageAddFavorite,
   getFavorites,
@@ -8,36 +8,29 @@ import {
 } from '../storage/favoritesStorage';
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<PokemonFavorite[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [favorites, setFavorites] = useState<FavoritePokemon[]>([]);
 
   useEffect(() => {
-    getFavorites().then((data) => {
-      setFavorites(data);
-      setLoaded(true);
-    });
+    setFavorites(getFavorites());
   }, []);
 
-  const addFavorite = useCallback(async (pokemon: PokemonFavorite) => {
-    await storageAddFavorite(pokemon);
-    setFavorites((prev) => {
-      if (prev.some((f) => f.id === pokemon.id)) return prev;
-      return [...prev, pokemon];
-    });
+  const addFavorite = useCallback((pokemon: FavoritePokemon) => {
+    const updated = storageAddFavorite(pokemon);
+    setFavorites(updated);
   }, []);
 
-  const removeFavorite = useCallback(async (id: number) => {
-    await storageRemoveFavorite(id);
-    setFavorites((prev) => prev.filter((f) => f.id !== id));
+  const removeFavorite = useCallback((id: number) => {
+    const updated = storageRemoveFavorite(id);
+    setFavorites(updated);
   }, []);
 
   const toggleFavorite = useCallback(
-    async (pokemon: PokemonFavorite) => {
-      const isFav = await storageIsFavorite(pokemon.id);
+    (pokemon: FavoritePokemon) => {
+      const isFav = storageIsFavorite(pokemon.id);
       if (isFav) {
-        await removeFavorite(pokemon.id);
+        removeFavorite(pokemon.id);
       } else {
-        await addFavorite(pokemon);
+        addFavorite(pokemon);
       }
     },
     [addFavorite, removeFavorite],
@@ -50,10 +43,19 @@ export function useFavorites() {
 
   return {
     favorites,
-    loaded,
     addFavorite,
     removeFavorite,
     toggleFavorite,
     isFavorite,
+  };
+}
+
+export function toFavoritePokemon(pokemon: PokemonListItem | PokemonDetail): FavoritePokemon {
+  return {
+    id: pokemon.id,
+    name: pokemon.name,
+    image: pokemon.image,
+    types: pokemon.types,
+    addedAt: Date.now(),
   };
 }
