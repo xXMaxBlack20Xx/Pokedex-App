@@ -5,20 +5,11 @@ import type {
   PokemonStat,
   PokemonType,
 } from '../types/pokemon';
-import { getIdFromPokemonUrl, getPokemonArtworkUrl, normalizePokemonName } from '../utils/pokemon';
+import { getPokemonArtworkUrl, normalizePokemonName } from '../utils/pokemon';
 
 const BASE_URL = 'https://pokeapi.co/api/v2';
+const REQUEST_TIMEOUT_MS = 10000;
 const detailCache = new Map<string, PokemonDetail>();
-
-async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal });
-
-  if (!response.ok) {
-    throw new Error(`PokéAPI respondió con estado ${response.status}`);
-  }
-
-  return response.json() as Promise<T>;
-}
 
 export async function getPokemonList(
   limit = 30,
@@ -29,63 +20,91 @@ export async function getPokemonList(
     `${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`,
     signal,
   );
-  const items = await Promise.all(
-    data.results.map((pokemon) => getPokemonDetail(pokemon.name, signal)),
-  );
+
+  if (!Array.isArray(data.results)) {
+    throw new Error('La respuesta de listado de PokeAPI no es valida.');
+  }
+
+  const details = await Promise.all(data.results.map((pokemon) => getPokemonDetail(pokemon.name, signal)));
 
   return {
-    items: items.map(toListItem),
+    items: details.map(toListItem),
     total: data.count,
     nextOffset: data.next ? offset + limit : null,
   };
 }
 
 export async function getPokemonDetail(
-  idOrName: number | string,
+  nameOrId: string | number,
   signal?: AbortSignal,
 ): Promise<PokemonDetail> {
-  const key = normalizePokemonName(String(idOrName));
+  const key = normalizePokemonName(String(nameOrId));
   const cached = detailCache.get(key);
   if (cached) return cached;
 
   const data = await fetchJson<PokeApiPokemon>(`${BASE_URL}/pokemon/${key}`, signal);
   const detail = mapPokemonDetail(data);
+
   detailCache.set(String(detail.id), detail);
   detailCache.set(detail.name, detail);
+
   return detail;
 }
 
 export async function getPokemonTypes(signal?: AbortSignal): Promise<PokemonType[]> {
   const data = await fetchJson<PokeApiListResponse>(`${BASE_URL}/type`, signal);
+
+  if (!Array.isArray(data.results)) {
+    throw new Error('La respuesta de tipos de PokeAPI no es valida.');
+  }
+
   return data.results
     .filter((type) => !['shadow', 'unknown'].includes(type.name))
     .map((type) => ({ name: type.name, url: type.url }));
 }
 
-export async function getPokemonListByType(
+export async function getPokemonByType(
   typeName: string,
   limit = 120,
   signal?: AbortSignal,
 ): Promise<PokemonListItem[]> {
-  const data = await fetchJson<PokeApiTypeResponse>(
-    `${BASE_URL}/type/${normalizePokemonName(typeName)}`,
-    signal,
-  );
+  const normalizedType = normalizePokemonName(typeName);
+  const data = await fetchJson<PokeApiTypeResponse>(`${BASE_URL}/type/${normalizedType}`, signal);
 
-  const unique = new Map<number, PokemonListItem>();
-  for (const item of data.pokemon) {
-    const id = getIdFromPokemonUrl(item.pokemon.url);
-    if (!id || unique.has(id)) continue;
-    unique.set(id, {
-      id,
-      name: item.pokemon.name,
-      image: getPokemonArtworkUrl(id),
-      types: [{ name: data.name }],
-    });
-    if (unique.size >= limit) break;
+  if (!Array.isArray(data.pokemon)) {
+    throw new Error('La respuesta de Pokemon por tipo no es valida.');
   }
 
-  return Array.from(unique.values()).sort((a, b) => a.id - b.id);
+  const names = data.pokemon.slice(0, limit).map((item) => item.pokemon.name);
+  const details = await Promise.all(names.map((name) => getPokemonDetail(name, signal)));
+
+  return details.map(toListItem).sort((a, b) => a.id - b.id);
+}
+
+async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  const abortFromCaller = () => controller.abort();
+  signal?.addEventListener('abort', abortFromCaller, { once: true });
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`PokeAPI respondio con estado ${response.status}.`);
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('La solicitud a PokeAPI tardo demasiado o fue cancelada.');
+    }
+
+    throw error instanceof Error ? error : new Error('No se pudo consultar PokeAPI.');
+  } finally {
+    clearTimeout(timeout);
+    signal?.removeEventListener('abort', abortFromCaller);
+  }
 }
 
 function toListItem(detail: PokemonDetail): PokemonListItem {
@@ -98,6 +117,10 @@ function toListItem(detail: PokemonDetail): PokemonListItem {
 }
 
 function mapPokemonDetail(data: PokeApiPokemon): PokemonDetail {
+  if (!data.id || !data.name || !Array.isArray(data.types) || !Array.isArray(data.stats)) {
+    throw new Error('La respuesta de detalle de PokeAPI no es valida.');
+  }
+
   return {
     id: data.id,
     name: data.name,
@@ -131,7 +154,6 @@ interface PokeApiListResponse {
 }
 
 interface PokeApiTypeResponse {
-  name: string;
   pokemon: Array<{ pokemon: NamedApiResource }>;
 }
 

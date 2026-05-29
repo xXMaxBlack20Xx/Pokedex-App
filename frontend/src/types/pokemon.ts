@@ -44,3 +44,10 @@ export interface PokemonListResponse {
   total: number;
   nextOffset: number | null;
 }
+
+export interface ComparePokemon {
+  id: number;
+  name: string;
+  image: string;
+  stats: PokemonStat[];
+}

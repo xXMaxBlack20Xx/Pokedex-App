@@ -1,31 +1,31 @@
-const STAT_LABELS: Record<string, string> = {
-  hp: 'HP',
-  attack: 'Attack',
-  defense: 'Defense',
-  'special-attack': 'Special Attack',
-  'special-defense': 'Special Defense',
-  speed: 'Speed',
-};
+export function formatPokemonId(id: number): string {
+  return `#${String(id).padStart(3, '0')}`;
+}
 
-export function formatPokemonName(name: string): string {
-  return name
+export function formatName(value: string): string {
+  return value
     .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 }
 
-export function formatPokemonNumber(id: number): string {
-  return `#${id.toString().padStart(3, '0')}`;
+export function formatHeight(height: number): string {
+  return `${(height / 10).toFixed(1)} m`;
+}
+
+export function formatWeight(weight: number): string {
+  return `${(weight / 10).toFixed(1)} kg`;
 }
 
 export function formatStatName(name: string): string {
-  return STAT_LABELS[name] ?? formatPokemonName(name);
-}
+  const labels: Record<string, string> = {
+    hp: 'HP',
+    attack: 'Attack',
+    defense: 'Defense',
+    'special-attack': 'Special Attack',
+    'special-defense': 'Special Defense',
+    speed: 'Speed',
+  };
 
-export function formatHeight(decimeters: number): string {
-  return `${(decimeters / 10).toFixed(1)} m`;
-}
-
-export function formatWeight(hectograms: number): string {
-  return `${(hectograms / 10).toFixed(1)} kg`;
+  return labels[name] ?? formatName(name);
 }

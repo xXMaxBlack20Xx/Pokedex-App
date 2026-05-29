@@ -1,46 +1,6 @@
-export function normalizePokemonName(value: string): string {
-  return value.trim().toLowerCase();
-}
+import type { FavoritePokemon, PokemonDetail, PokemonListItem } from '../types/pokemon';
 
-export function matchesPokemonSearch(name: string, query: string): boolean {
-  const normalizedQuery = normalizePokemonName(query);
-  if (!normalizedQuery) return true;
-  return normalizePokemonName(name).includes(normalizedQuery);
-}
-
-export function getPokemonArtworkUrl(id: number): string {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-}
-
-export function getIdFromPokemonUrl(url: string): number | null {
-  const match = url.match(/\/pokemon\/(\d+)\/?$/);
-  if (!match) return null;
-  const id = Number(match[1]);
-  return Number.isFinite(id) ? id : null;
-}
-
-export const TYPE_COLORS: Record<string, string> = {
-  normal: '#a8a77a',
-  fire: '#ee8130',
-  water: '#6390f0',
-  electric: '#f7d02c',
-  grass: '#7ac74c',
-  ice: '#96d9d6',
-  fighting: '#c22e28',
-  poison: '#a33ea1',
-  ground: '#e2bf65',
-  flying: '#a98ff3',
-  psychic: '#f95587',
-  bug: '#a6b91a',
-  rock: '#b6a136',
-  ghost: '#735797',
-  dragon: '#6f35fc',
-  dark: '#705746',
-  steel: '#b7b7ce',
-  fairy: '#d685ad',
-};
-
-export const REQUIRED_STAT_ORDER = [
+export const requiredStatOrder = [
   'hp',
   'attack',
   'defense',
@@ -48,3 +8,34 @@ export const REQUIRED_STAT_ORDER = [
   'special-defense',
   'speed',
 ] as const;
+
+export function normalizePokemonName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+export function matchesPokemonSearch(name: string, query: string): boolean {
+  const normalizedQuery = normalizePokemonName(query);
+  return !normalizedQuery || normalizePokemonName(name).includes(normalizedQuery);
+}
+
+export function getIdFromPokemonUrl(url: string): number | null {
+  const match = url.match(/\/pokemon\/(\d+)\/?$/);
+  if (!match) return null;
+
+  const id = Number(match[1]);
+  return Number.isFinite(id) ? id : null;
+}
+
+export function getPokemonArtworkUrl(id: number): string {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+}
+
+export function toFavoritePokemon(pokemon: PokemonDetail | PokemonListItem): FavoritePokemon {
+  return {
+    id: pokemon.id,
+    name: pokemon.name,
+    image: pokemon.image,
+    types: pokemon.types,
+    addedAt: Date.now(),
+  };
+}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getPokemonList, getPokemonListByType } from '../services/pokeApi';
+import { getPokemonByType, getPokemonList } from '../services/pokeApi';
 import type { PokemonListItem } from '../types/pokemon';
 import { matchesPokemonSearch, normalizePokemonName } from '../utils/pokemon';
 
@@ -21,7 +21,7 @@ export function usePokemonList(searchQuery: string, selectedType: string) {
         setErrorMessage(null);
         const normalizedType = normalizePokemonName(selectedType);
         if (normalizedType) {
-          const items = await getPokemonListByType(normalizedType, 120, abortController.signal);
+          const items = await getPokemonByType(normalizedType, 120, abortController.signal);
           setPokemon(items);
           setNextOffset(null);
         } else {
@@ -68,6 +68,22 @@ export function usePokemonList(searchQuery: string, selectedType: string) {
     }
   }
 
+  async function refresh() {
+    const normalizedType = normalizePokemonName(selectedType);
+    setErrorMessage(null);
+
+    if (normalizedType) {
+      const items = await getPokemonByType(normalizedType, 120);
+      setPokemon(items);
+      setNextOffset(null);
+      return;
+    }
+
+    const response = await getPokemonList(PAGE_SIZE, 0);
+    setPokemon(response.items);
+    setNextOffset(response.nextOffset);
+  }
+
   return {
     pokemon,
     filteredPokemon,
@@ -76,5 +92,6 @@ export function usePokemonList(searchQuery: string, selectedType: string) {
     errorMessage,
     canLoadMore: nextOffset !== null && !selectedType,
     loadMore,
+    refresh,
   };
 }
