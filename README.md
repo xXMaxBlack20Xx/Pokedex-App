@@ -7,7 +7,7 @@ Rodrigo Máximo Trigo González
 Aplicación móvil desarrollada con Expo, React Native y TypeScript que consume PokéAPI para listar Pokémon, consultar detalles, buscar, filtrar por tipo, guardar favoritos y comparar estadísticas base.
 
 ## Tecnologías utilizadas
-- Expo
+- Expo SDK 54
 - React Native
 - TypeScript
 - PokéAPI
@@ -30,6 +30,12 @@ npx expo start
 Después:
 - Escanear el QR con Expo Go en Android o iOS.
 - O abrir en emulador si está disponible.
+
+Si el puerto 8081 está ocupado por otro proyecto, ejecutar:
+
+```bash
+npx expo start --clear --port 8082
+```
 
 ## Funcionalidades
 - Listado de Pokémon.
@@ -55,6 +61,7 @@ Agregar espacio para capturas:
 - ESLint mostraba una advertencia por usar sintaxis ESM en `eslint.config.js` sin declarar el paquete como módulo. Se renombró a `eslint.config.mjs`.
 - Al validar `npx expo start --clear`, el puerto 8081 estaba ocupado por otro proyecto. Se verificó el arranque usando `npx expo start --clear --port 8082`.
 - `npm audit --omit=dev` reportó vulnerabilidades moderadas transitivas de Expo relacionadas con `uuid`. La corrección propuesta por npm requiere `npm audit fix --force` y cambiaría Expo a una versión incompatible, por lo que no se aplicó para no romper Expo Go.
+- El dispositivo de prueba usaba Expo Go 54 y el proyecto había quedado en SDK 56. Se bajó Expo a SDK 54 y se alinearon `react`, `react-native`, `expo-status-bar`, `react-native-safe-area-context`, `react-native-screens`, `@types/react` y `typescript` con `npx expo install --fix`.
 
 ## Checklist final
 - [x] El proyecto instala dependencias correctamente.
