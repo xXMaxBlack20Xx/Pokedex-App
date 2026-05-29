@@ -1,32 +1,40 @@
+import { StyleSheet, TextInput, View } from 'react-native';
+import { colors } from '../constants/colors';
+
 interface SearchBarProps {
   value: string;
-  onChange: (text: string) => void;
-  placeholder?: string;
+  onChangeText: (value: string) => void;
 }
 
-export function SearchBar({
-  value,
-  onChange,
-  placeholder = 'Buscar Pokémon por nombre...',
-}: SearchBarProps) {
+export function SearchBar({ value, onChangeText }: SearchBarProps) {
   return (
-    <div className="field search-field">
-      <label htmlFor="pokemon-search">Buscar</label>
-      <div className="input-action">
-        <input
-          id="pokemon-search"
-          type="search"
-          autoComplete="off"
-          value={value}
-          placeholder={placeholder}
-          onChange={(event) => onChange(event.target.value)}
-        />
-        {value ? (
-          <button type="button" className="button button--ghost" onClick={() => onChange('')}>
-            Limpiar
-          </button>
-        ) : null}
-      </div>
-    </div>
+    <View style={styles.container}>
+      <TextInput
+        autoCapitalize="none"
+        autoCorrect={false}
+        clearButtonMode="while-editing"
+        onChangeText={onChangeText}
+        placeholder="Buscar por nombre"
+        placeholderTextColor={colors.textMuted}
+        style={styles.input}
+        value={value}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  input: {
+    color: colors.text,
+    fontSize: 16,
+    minHeight: 48,
+  },
+});
