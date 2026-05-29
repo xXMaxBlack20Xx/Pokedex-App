@@ -54,6 +54,7 @@ Agregar espacio para capturas:
 - TypeScript detectó falta de `expo-status-bar`, un ancho porcentual no inferido correctamente y valores posiblemente nulos en el comparador. Se instaló `expo-status-bar` y se corrigieron los tipos.
 - ESLint mostraba una advertencia por usar sintaxis ESM en `eslint.config.js` sin declarar el paquete como módulo. Se renombró a `eslint.config.mjs`.
 - Al validar `npx expo start --clear`, el puerto 8081 estaba ocupado por otro proyecto. Se verificó el arranque usando `npx expo start --clear --port 8082`.
+- `npm audit --omit=dev` reportó vulnerabilidades moderadas transitivas de Expo relacionadas con `uuid`. La corrección propuesta por npm requiere `npm audit fix --force` y cambiaría Expo a una versión incompatible, por lo que no se aplicó para no romper Expo Go.
 
 ## Checklist final
 - [x] El proyecto instala dependencias correctamente.
