@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { HomePage } from './src/pages/HomePage';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AppNavigator } from './src/navigation/AppNavigator';
 
 export default function App() {
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="dark" />
-      <HomePage />
-    </>
+      <AppNavigator />
+    </SafeAreaProvider>
   );
 }

@@ -1,142 +1,77 @@
-# Mini Pokédex con PokéAPI
+# Pokédex Mobile
 
-Proyecto de Clase 1 para construir una Mini Pokédex con backend propio. El frontend móvil no consume PokéAPI directamente; todas las consultas pasan por un backend en NestJS que consulta, parsea, sanitiza y normaliza la información antes de entregarla a Expo Go.
+## Desarrollador
+Rodrigo Máximo Trigo González
 
-## Arquitectura General
+## Descripción
+Aplicación móvil desarrollada con Expo, React Native y TypeScript que consume PokéAPI para listar Pokémon, consultar detalles, buscar, filtrar por tipo, guardar favoritos y comparar estadísticas base.
 
-```txt
-frontend Expo Go SDK 54
-  -> GET http://localhost:3000/api/pokemon?page=1&limit=20
-backend NestJS
-  -> GET https://pokeapi.co/api/v2/pokemon?limit=20
-  -> GET https://pokeapi.co/api/v2/pokemon/{name}
-```
+## Tecnologías utilizadas
+- Expo SDK 54
+- React Native
+- TypeScript
+- PokéAPI
+- AsyncStorage
+- React Navigation
+- FlatList
 
-## Tecnologías
-
-- Backend: NestJS, TypeScript, REST API, fetch nativo.
-- Frontend: Expo Go SDK 54, React Native, TypeScript, fetch nativo.
-- API externa: PokéAPI.
-
-## Estructura
-
-```txt
-backend/
-  src/
-    pokemon/
-      domain/
-      application/
-      infrastructure/
-      presentation/
-frontend/
-  src/
-    components/
-    pages/
-    services/
-    types/
-```
-
-## Backend
-
-Instalar dependencias:
-
-```bash
-cd backend
-npm install
-```
-
-Crear variables de entorno a partir del ejemplo:
-
-```bash
-cp .env
-```
-
-Ejecutar en desarrollo:
-
-```bash
-npm run start:dev
-```
-
-Endpoint disponible en Clase 1:
-
-```txt
-GET http://localhost:3000/api/pokemon?page=1&limit=20
-```
-
-Respuesta sanitizada y paginada:
-
-```ts
-interface PokemonListItemDto {
-  id: number;
-  name: string;
-  image: string;
-  types: string[];
-}
-
-interface PokemonListPageDto {
-  items: PokemonListItemDto[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-```
-
-## Frontend
-
-Instalar dependencias:
-
+## Instalación
 ```bash
 cd frontend
 npm install
 ```
 
-Crear variables de entorno a partir del ejemplo:
-
+## Ejecución con Expo Go
 ```bash
-cp .env
+cd frontend
+npx expo start
 ```
 
-Ejecutar en desarrollo:
+Después:
+- Escanear el QR con Expo Go en Android o iOS.
+- O abrir en emulador si está disponible.
+
+Si el puerto 8081 está ocupado por otro proyecto, ejecutar:
 
 ```bash
-npm run start
+npx expo start --clear --port 8082
 ```
 
-Abrir la aplicación con Expo Go escaneando el QR que muestra Metro.
+## Funcionalidades
+- Listado de Pokémon.
+- Detalle de Pokémon.
+- Búsqueda por nombre.
+- Filtro por tipo.
+- Favoritos persistentes.
+- Comparador de estadísticas.
+- Estados de carga, error y sin resultados.
+- Diseño adaptado a móvil.
 
-También existe el alias:
+## Capturas
+Agregar espacio para capturas:
+- Pantalla principal.
+- Detalle.
+- Favoritos.
+- Comparador.
 
-```bash
-npm run dev
-```
+## Problemas encontrados y solución
+- El proyecto actual estaba implementado como aplicación web con Vite, React Router y `localStorage`. Se migró el directorio `frontend` a Expo + React Native, usando React Navigation y AsyncStorage para cumplir el apartado móvil.
+- El primer `npx expo install` no pudo detectar el SDK porque `expo` todavía no estaba instalado localmente. Se ejecutó `npm install` y luego se alinearon dependencias con `npx expo install`.
+- TypeScript detectó falta de `expo-status-bar`, un ancho porcentual no inferido correctamente y valores posiblemente nulos en el comparador. Se instaló `expo-status-bar` y se corrigieron los tipos.
+- ESLint mostraba una advertencia por usar sintaxis ESM en `eslint.config.js` sin declarar el paquete como módulo. Se renombró a `eslint.config.mjs`.
+- Al validar `npx expo start --clear`, el puerto 8081 estaba ocupado por otro proyecto. Se verificó el arranque usando `npx expo start --clear --port 8082`.
+- `npm audit --omit=dev` reportó vulnerabilidades moderadas transitivas de Expo relacionadas con `uuid`. La corrección propuesta por npm requiere `npm audit fix --force` y cambiaría Expo a una versión incompatible, por lo que no se aplicó para no romper Expo Go.
+- El dispositivo de prueba usaba Expo Go 54 y el proyecto había quedado en SDK 56. Se bajó Expo a SDK 54 y se alinearon `react`, `react-native`, `expo-status-bar`, `react-native-safe-area-context`, `react-native-screens`, `@types/react` y `typescript` con `npx expo install --fix`.
 
-Para usar Expo Go en un celular físico, ajusta `EXPO_PUBLIC_API_BASE_URL` en `frontend/.env` con la IP local de tu computadora, por ejemplo `http://192.168.1.50:3000/api`. En simulador iOS puede funcionar `localhost`; en emulador Android suele requerirse `http://10.0.2.2:3000/api`.
-
-## Funcionalidades Implementadas en Clase 1
-
-- Backend NestJS con módulo `pokemon`.
-- Endpoint propio `GET /api/pokemon?page=1&limit=20`.
-- Paginación de 20 Pokémon por página.
-- Consumo de PokéAPI desde backend.
-- Consulta de detalle de cada Pokémon para obtener id, imagen y tipos.
-- Mapper para convertir respuesta cruda de PokéAPI a datos controlados.
-- Manejo básico de error cuando falla PokéAPI.
-- CORS configurado para desarrollo local.
-- Frontend Expo Go SDK 54 + React Native + TypeScript.
-- Servicio frontend separado para consumir solo el backend local.
-- Grid responsive con al menos 20 tarjetas de Pokémon.
-- Barra inferior de navegación para avanzar y retroceder páginas.
-- Tarjetas con número, nombre, imagen y tipos.
-- Estados de carga, error y listado vacío.
-
-## Evidencia Esperada Para Entrega
-
-- Captura del backend respondiendo `GET /api/pokemon?page=1&limit=20`.
-- Captura del frontend mostrando 20 Pokémon y barra inferior de paginación.
-- Evidencia de scripts ejecutando sin errores:
-  - `cd backend && npm run start:dev`
-  - `cd frontend && npm run start`
-- Commit inicial con la estructura del monorepo y README.
+## Checklist final
+- [x] El proyecto instala dependencias correctamente.
+- [x] La app abre en Expo Go.
+- [x] El listado carga correctamente.
+- [x] El detalle funciona.
+- [x] La búsqueda funciona.
+- [x] El filtro por tipo funciona.
+- [x] Los favoritos persisten con AsyncStorage.
+- [x] El comparador funciona.
+- [x] Hay estados de carga, error y vacío.
+- [x] El código está separado por componentes, servicios, hooks, tipos y pantallas.
+- [x] El README explica cómo ejecutar el proyecto.

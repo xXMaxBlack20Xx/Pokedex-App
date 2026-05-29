@@ -1,10 +1,15 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { colors } from '../constants/colors';
 
-export function LoadingState() {
+interface LoadingStateProps {
+  message?: string;
+}
+
+export function LoadingState({ message = 'Cargando Pokédex...' }: LoadingStateProps) {
   return (
     <View style={styles.container}>
-      <ActivityIndicator color="#c83642" size="large" />
-      <Text style={styles.message}>Cargando Pokémon...</Text>
+      <ActivityIndicator color={colors.primary} size="large" />
+      <Text style={styles.message}>{message}</Text>
     </View>
   );
 }
@@ -12,12 +17,13 @@ export function LoadingState() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 32,
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
   },
   message: {
-    color: '#596579',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.textMuted,
+    marginTop: 12,
+    textAlign: 'center',
   },
 });

@@ -1,24 +1,37 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '../constants/colors';
 
-export function EmptyState() {
+interface EmptyStateProps {
+  title: string;
+  message: string;
+}
+
+export function EmptyState({ title, message }: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.message}>No hay Pokémon disponibles.</Text>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.message}>{message}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
-    borderColor: '#d8e0ea',
-    borderRadius: 8,
-    borderWidth: 1,
-    padding: 18,
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  title: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   message: {
-    color: '#596579',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.textMuted,
+    lineHeight: 20,
+    textAlign: 'center',
   },
 });

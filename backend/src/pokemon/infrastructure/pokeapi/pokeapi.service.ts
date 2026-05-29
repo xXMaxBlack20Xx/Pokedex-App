@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { Pokemon, PokemonDetail } from '../../domain/models/pokemon.model';
 import { PokemonListPage } from '../../domain/models/pokemon-list-page.model';
-import { mapPokeApiPokemonToPokemon } from '../mappers/pokemon.mapper';
+import {
+  mapPokeApiPokemonToPokemon,
+  mapPokeApiPokemonToPokemonDetail,
+} from '../mappers/pokemon.mapper';
 import {
   PokeApiListResponse,
   PokeApiPokemonDetailResponse,
+  PokeApiTypeDetailResponse,
+  PokeApiTypeListResponse,
 } from './pokeapi.types';
 
 @Injectable()
@@ -39,6 +45,41 @@ export class PokeApiService {
       hasNextPage: page < totalPages,
       hasPreviousPage: page > 1,
     };
+  }
+
+  async getPokemonDetail(idOrName: number | string): Promise<PokemonDetail> {
+    const raw = await this.fetchJson<PokeApiPokemonDetailResponse>(
+      `${this.baseUrl}/pokemon/${String(idOrName).toLowerCase().trim()}`,
+    );
+    return mapPokeApiPokemonToPokemonDetail(raw);
+  }
+
+  async getPokemonTypes(): Promise<string[]> {
+    const data = await this.fetchJson<PokeApiTypeListResponse>(
+      `${this.baseUrl}/type`,
+    );
+    return data.results
+      .map((t) => t.name)
+      .filter((name) => name !== 'unknown' && name !== 'shadow');
+  }
+
+  async getPokemonByType(
+    typeName: string,
+    limit = 60,
+  ): Promise<Pokemon[]> {
+    const data = await this.fetchJson<PokeApiTypeDetailResponse>(
+      `${this.baseUrl}/type/${typeName.toLowerCase().trim()}`,
+    );
+
+    const entries = data.pokemon.slice(0, limit);
+
+    const details = await Promise.all(
+      entries.map((entry) =>
+        this.fetchJson<PokeApiPokemonDetailResponse>(entry.pokemon.url),
+      ),
+    );
+
+    return details.map(mapPokeApiPokemonToPokemon);
   }
 
   private async fetchJson<T>(url: string): Promise<T> {

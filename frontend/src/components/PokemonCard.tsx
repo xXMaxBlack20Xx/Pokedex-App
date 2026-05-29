@@ -1,95 +1,97 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { PokemonListItem } from '../types/pokemon';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors } from '../constants/colors';
+import { FavoriteButton } from './FavoriteButton';
+import type { FavoritePokemon, PokemonListItem } from '../types/pokemon';
+import { formatName, formatPokemonId } from '../utils/formatting';
+import { getTypeColor } from '../utils/typeColors';
 
 interface PokemonCardProps {
-  pokemon: PokemonListItem;
+  pokemon: PokemonListItem | FavoritePokemon;
+  isFavorite: boolean;
+  onPress: () => void;
+  onToggleFavorite: () => void;
 }
 
-export function PokemonCard({ pokemon }: PokemonCardProps) {
+export function PokemonCard({ pokemon, isFavorite, onPress, onToggleFavorite }: PokemonCardProps) {
   return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.number}>
-          #{pokemon.id.toString().padStart(3, '0')}
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.card}>
+      <View style={styles.imageWrap}>
+        <Image source={{ uri: pokemon.image }} style={styles.image} />
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.number}>{formatPokemonId(pokemon.id)}</Text>
+        <Text numberOfLines={1} style={styles.name}>
+          {formatName(pokemon.name)}
         </Text>
-        <Text style={styles.name}>{formatPokemonName(pokemon.name)}</Text>
+        <View style={styles.types}>
+          {pokemon.types.map((type) => (
+            <View key={type.name} style={[styles.typeChip, { backgroundColor: getTypeColor(type.name) }]}>
+              <Text style={styles.typeText}>{formatName(type.name)}</Text>
+            </View>
+          ))}
+        </View>
       </View>
-
-      <View style={styles.imageContainer}>
-        <Image
-          accessibilityLabel={pokemon.name}
-          resizeMode="contain"
-          source={{ uri: pokemon.image }}
-          style={styles.image}
-        />
-      </View>
-
-      <View style={styles.types}>
-        {pokemon.types.map((type) => (
-          <Text key={type} style={styles.type}>
-            {type}
-          </Text>
-        ))}
-      </View>
-    </View>
+      <FavoriteButton compact isFavorite={isFavorite} onPress={onToggleFavorite} />
+    </Pressable>
   );
-}
-
-function formatPokemonName(name: string): string {
-  return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderColor: '#d8e0ea',
-    borderRadius: 8,
-    borderWidth: 1,
-    flex: 1,
-    gap: 14,
-    minHeight: 262,
-    padding: 16,
-    shadowColor: '#1f2a37',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-  },
-  header: {
-    gap: 6,
-  },
-  number: {
-    color: '#c83642',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  name: {
-    color: '#17202b',
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  imageContainer: {
     alignItems: 'center',
-    flex: 1,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 22,
+    borderWidth: 1,
+    flexDirection: 'row',
+    marginBottom: 12,
+    padding: 12,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+  },
+  imageWrap: {
+    alignItems: 'center',
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: 18,
+    height: 76,
     justifyContent: 'center',
-    minHeight: 118,
+    marginRight: 12,
+    width: 76,
   },
   image: {
-    height: 118,
-    width: 118,
+    height: 68,
+    width: 68,
+  },
+  content: {
+    flex: 1,
+    minWidth: 0,
+  },
+  number: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  name: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '900',
+    marginTop: 2,
   },
   types: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    minHeight: 28,
+    gap: 6,
+    marginTop: 8,
   },
-  type: {
-    backgroundColor: '#e8f3ee',
+  typeChip: {
     borderRadius: 999,
-    color: '#1f6b4d',
-    fontSize: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  typeText: {
+    color: colors.surface,
+    fontSize: 11,
     fontWeight: '800',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
   },
 });
